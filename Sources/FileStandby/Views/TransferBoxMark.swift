@@ -21,6 +21,10 @@ enum TransferBoxMarkImage {
         context.saveGState()
         context.translateBy(x: rect.minX, y: rect.minY)
         context.scaleBy(x: rect.width / 100, y: rect.height / 100)
+        // AppKit's drawing coordinate system differs between an NSImage and a
+        // view. Normalize the mark so its open flaps always face upward.
+        context.translateBy(x: 0, y: 100)
+        context.scaleBy(x: 1, y: -1)
         defer { context.restoreGState() }
 
         // Use only broad, filled surfaces at small sizes. The previous closed
