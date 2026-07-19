@@ -23,30 +23,23 @@ enum TransferBoxMarkImage {
         context.scaleBy(x: rect.width / 100, y: rect.height / 100)
         defer { context.restoreGState() }
 
-        let shadow = NSShadow()
-        shadow.shadowColor = NSColor.black.withAlphaComponent(0.18)
-        shadow.shadowBlurRadius = 3
-        shadow.shadowOffset = NSSize(width: 0, height: -2)
-        shadow.set()
-
-        path([.init(x: 12, y: 56), .init(x: 35, y: 91), .init(x: 50, y: 77), .init(x: 30, y: 47)])
-            .fill(with: color.blended(withFraction: 0.18, of: .white) ?? color)
-        path([.init(x: 88, y: 56), .init(x: 65, y: 91), .init(x: 50, y: 77), .init(x: 70, y: 47)])
+        // Use only broad, filled surfaces at small sizes. The previous closed
+        // outline drew an unwanted diagonal through the mark when rasterized.
+        path([.init(x: 12, y: 56), .init(x: 31, y: 23), .init(x: 50, y: 37), .init(x: 31, y: 61)])
+            .fill(with: color.withAlphaComponent(0.84))
+        path([.init(x: 88, y: 56), .init(x: 69, y: 23), .init(x: 50, y: 37), .init(x: 69, y: 61)])
             .fill(with: color)
 
-        path([.init(x: 12, y: 56), .init(x: 50, y: 77), .init(x: 88, y: 56), .init(x: 50, y: 37)])
-            .fill(with: color.withAlphaComponent(0.45))
+        path([.init(x: 12, y: 56), .init(x: 50, y: 78), .init(x: 50, y: 96), .init(x: 18, y: 78)])
+            .fill(with: color.withAlphaComponent(0.74))
+        path([.init(x: 88, y: 56), .init(x: 50, y: 78), .init(x: 50, y: 96), .init(x: 82, y: 78)])
+            .fill(with: color)
 
-        path([.init(x: 14, y: 59), .init(x: 37, y: 91), .init(x: 50, y: 77), .init(x: 63, y: 91), .init(x: 86, y: 59)])
-            .stroke(with: color, lineWidth: 6, lineJoin: .round)
+        path([.init(x: 12, y: 56), .init(x: 50, y: 78), .init(x: 88, y: 56), .init(x: 50, y: 37)])
+            .fill(with: color.withAlphaComponent(0.43))
 
-        path([.init(x: 12, y: 56), .init(x: 35, y: 91), .init(x: 50, y: 77), .init(x: 65, y: 91), .init(x: 88, y: 56)])
+        openPath([.init(x: 14, y: 57), .init(x: 50, y: 78), .init(x: 86, y: 57)])
             .stroke(with: color, lineWidth: 5, lineJoin: .round)
-
-        path([.init(x: 14, y: 57), .init(x: 31, y: 25), .init(x: 50, y: 37), .init(x: 34, y: 62)])
-            .fill(with: color.withAlphaComponent(0.86))
-        path([.init(x: 86, y: 57), .init(x: 69, y: 25), .init(x: 50, y: 37), .init(x: 66, y: 62)])
-            .fill(with: color)
     }
 
     private static func path(_ points: [NSPoint]) -> NSBezierPath {
@@ -55,6 +48,14 @@ enum TransferBoxMarkImage {
         path.move(to: first)
         points.dropFirst().forEach(path.line(to:))
         path.close()
+        return path
+    }
+
+    private static func openPath(_ points: [NSPoint]) -> NSBezierPath {
+        let path = NSBezierPath()
+        guard let first = points.first else { return path }
+        path.move(to: first)
+        points.dropFirst().forEach(path.line(to:))
         return path
     }
 }
