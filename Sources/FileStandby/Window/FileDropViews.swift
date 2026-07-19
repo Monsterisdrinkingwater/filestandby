@@ -224,20 +224,14 @@ final class EdgeDropView: NSView {
         background.setFill()
         path.fill()
 
-        let symbolName = isDraggingOver ? "arrow.down" : "tray.fill"
-        let configuration = NSImage.SymbolConfiguration(pointSize: 11, weight: .bold)
-        if let image = NSImage(systemSymbolName: symbolName, accessibilityDescription: "文件架")?
-            .withSymbolConfiguration(configuration) {
-            image.isTemplate = true
-            NSColor.white.set()
-            let imageRect = NSRect(
-                x: bounds.midX - image.size.width / 2,
-                y: bounds.midY - image.size.height / 2,
-                width: image.size.width,
-                height: image.size.height
-            )
-            image.draw(in: imageRect)
-        }
+        let markSize = min(bounds.width, bounds.height) * 0.56
+        let markRect = NSRect(
+            x: bounds.midX - markSize / 2,
+            y: bounds.midY - markSize / 2,
+            width: markSize,
+            height: markSize
+        )
+        TransferBoxMarkImage.draw(in: markRect, color: .white)
     }
 
     private func finishTargeting() {

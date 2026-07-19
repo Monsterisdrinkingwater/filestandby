@@ -141,37 +141,6 @@ func drawOriginalStandbyMark() {
     rim.line(to: NSPoint(x: 720, y: 516))
     rim.stroke()
 
-    NSColor(red: 1.0, green: 0.72, blue: 0.24, alpha: 1).setStroke()
-    let transferBand = NSBezierPath()
-    transferBand.lineWidth = 40
-    transferBand.lineCapStyle = .round
-    transferBand.move(to: NSPoint(x: 382, y: 356))
-    transferBand.line(to: NSPoint(x: 472, y: 312))
-    transferBand.stroke()
-
-    let bandTip = NSBezierPath()
-    bandTip.move(to: NSPoint(x: 488, y: 300))
-    bandTip.line(to: NSPoint(x: 432, y: 286))
-    bandTip.line(to: NSPoint(x: 458, y: 338))
-    bandTip.close()
-    NSColor(red: 1.0, green: 0.72, blue: 0.24, alpha: 1).setFill()
-    bandTip.fill()
-
-    NSColor(red: 1.0, green: 0.72, blue: 0.24, alpha: 1).setStroke()
-    let returnBand = NSBezierPath()
-    returnBand.lineWidth = 40
-    returnBand.lineCapStyle = .round
-    returnBand.move(to: NSPoint(x: 642, y: 356))
-    returnBand.line(to: NSPoint(x: 552, y: 312))
-    returnBand.stroke()
-
-    let returnTip = NSBezierPath()
-    returnTip.move(to: NSPoint(x: 536, y: 300))
-    returnTip.line(to: NSPoint(x: 592, y: 286))
-    returnTip.line(to: NSPoint(x: 566, y: 338))
-    returnTip.close()
-    NSColor(red: 1.0, green: 0.72, blue: 0.24, alpha: 1).setFill()
-    returnTip.fill()
 }
 
 enum IconError: Error {

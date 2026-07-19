@@ -84,9 +84,7 @@ struct ShelfView: View {
                                 )
                             )
 
-                        Image(systemName: "tray.and.arrow.down.fill")
-                            .font(.system(size: 14, weight: .bold))
-                            .foregroundStyle(.white)
+                        TransferBoxMark(size: 18)
                     }
                     .frame(width: 32, height: 32)
 
@@ -161,9 +159,7 @@ struct ShelfView: View {
                     .fill(Color.accentColor.opacity(0.11))
                     .frame(width: 78, height: 78)
 
-                Image(systemName: "arrow.down.doc.fill")
-                    .font(.system(size: 34, weight: .medium))
-                    .foregroundStyle(Color.accentColor)
+                TransferBoxMark(size: 44, color: .controlAccentColor)
             }
 
             VStack(spacing: 6) {
@@ -235,10 +231,8 @@ struct ShelfView: View {
                 .padding(12)
 
             VStack(spacing: 12) {
-                Image(systemName: "tray.and.arrow.down.fill")
-                    .font(.system(size: 42, weight: .semibold))
-                    .foregroundStyle(Color.accentColor)
-                    .symbolEffect(.bounce, value: store.isDropTargeted)
+                TransferBoxMark(size: 48, color: .controlAccentColor)
+                    .scaleEffect(store.isDropTargeted ? 1.08 : 1)
 
                 Text("松开以暂存")
                     .font(.system(size: 16, weight: .bold))
