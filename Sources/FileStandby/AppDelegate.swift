@@ -24,7 +24,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func configureStatusItem() {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         if let button = statusItem.button {
-            let image = TransferBoxMarkImage.image(size: 16, color: .black)
+            let image = TransferBoxMarkImage.image(size: 16)
             image.isTemplate = true
             button.image = image
             button.toolTip = "File Standby"

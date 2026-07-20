@@ -159,7 +159,7 @@ struct ShelfView: View {
                     .fill(Color.accentColor.opacity(0.11))
                     .frame(width: 78, height: 78)
 
-                TransferBoxMark(size: 44, color: .controlAccentColor)
+                TransferBoxMark(size: 44)
             }
 
             VStack(spacing: 6) {
@@ -231,7 +231,7 @@ struct ShelfView: View {
                 .padding(12)
 
             VStack(spacing: 12) {
-                TransferBoxMark(size: 48, color: .controlAccentColor)
+                TransferBoxMark(size: 48)
                     .scaleEffect(store.isDropTargeted ? 1.08 : 1)
 
                 Text("松开以暂存")

@@ -49,8 +49,8 @@ func renderIcon(pixels: Int) throws -> Data {
     shadow.set()
     NSGradient(
         colors: [
-            NSColor(red: 0.09, green: 0.38, blue: 1.0, alpha: 1),
-            NSColor(red: 0.12, green: 0.68, blue: 1.0, alpha: 1)
+            NSColor(red: 0.07, green: 0.11, blue: 0.20, alpha: 1),
+            NSColor(red: 0.15, green: 0.22, blue: 0.37, alpha: 1)
         ]
     )?.draw(in: iconPath, angle: -55)
     NSGraphicsContext.restoreGraphicsState()
@@ -64,8 +64,8 @@ func renderIcon(pixels: Int) throws -> Data {
     highlight.lineWidth = 8
     highlight.stroke()
 
-    NSColor.white.withAlphaComponent(0.12).setFill()
-    NSBezierPath(ovalIn: NSRect(x: 244, y: 244, width: 536, height: 536)).fill()
+    NSColor(red: 0.28, green: 0.42, blue: 0.66, alpha: 0.20).setFill()
+    NSBezierPath(ovalIn: NSRect(x: 210, y: 182, width: 604, height: 604)).fill()
 
     drawOriginalStandbyMark()
 
@@ -77,70 +77,61 @@ func renderIcon(pixels: Int) throws -> Data {
 
 func drawOriginalStandbyMark() {
     let shadow = NSShadow()
-    shadow.shadowColor = NSColor.black.withAlphaComponent(0.20)
-    shadow.shadowBlurRadius = 22
-    shadow.shadowOffset = NSSize(width: 0, height: -12)
-
-    NSGraphicsContext.saveGraphicsState()
+    shadow.shadowColor = NSColor.black.withAlphaComponent(0.35)
+    shadow.shadowBlurRadius = 28
+    shadow.shadowOffset = NSSize(width: 0, height: -18)
     shadow.set()
 
-    let leftLid = NSBezierPath()
-    leftLid.move(to: NSPoint(x: 292, y: 558))
-    leftLid.line(to: NSPoint(x: 420, y: 710))
-    leftLid.line(to: NSPoint(x: 516, y: 640))
-    leftLid.line(to: NSPoint(x: 398, y: 500))
-    leftLid.close()
-    NSColor(red: 0.86, green: 0.95, blue: 1.0, alpha: 1).setFill()
-    leftLid.fill()
+    fillRoundedRect(NSRect(x: 408, y: 565, width: 208, height: 224), radius: 48, color: NSColor(red: 0.68, green: 0.43, blue: 0.93, alpha: 1))
+    fillRoundedRect(NSRect(x: 355, y: 498, width: 314, height: 248), radius: 54, color: NSColor(red: 1.0, green: 0.78, blue: 0.30, alpha: 1))
+    fillRoundedRect(NSRect(x: 312, y: 430, width: 400, height: 260), radius: 56, color: NSColor(red: 0.20, green: 0.82, blue: 0.75, alpha: 1))
+    fillRoundedRect(NSRect(x: 384, y: 354, width: 256, height: 218), radius: 52, color: .white)
+    fillRoundedRect(NSRect(x: 434, y: 484, width: 156, height: 18), radius: 9, color: NSColor(red: 0.78, green: 0.82, blue: 0.89, alpha: 1))
+    fillRoundedRect(NSRect(x: 434, y: 442, width: 118, height: 18), radius: 9, color: NSColor(red: 0.82, green: 0.85, blue: 0.91, alpha: 1))
+    fillRoundedRect(NSRect(x: 434, y: 400, width: 82, height: 18), radius: 9, color: NSColor(red: 0.86, green: 0.89, blue: 0.94, alpha: 1))
 
-    let rightLid = NSBezierPath()
-    rightLid.move(to: NSPoint(x: 732, y: 558))
-    rightLid.line(to: NSPoint(x: 604, y: 710))
-    rightLid.line(to: NSPoint(x: 508, y: 640))
-    rightLid.line(to: NSPoint(x: 626, y: 500))
-    rightLid.close()
-    NSColor(red: 0.98, green: 0.99, blue: 1.0, alpha: 1).setFill()
-    rightLid.fill()
+    polygon([.init(x: 250, y: 465), .init(x: 310, y: 570), .init(x: 370, y: 570), .init(x: 338, y: 420)])
+        .fill(with: NSColor(red: 0.18, green: 0.25, blue: 0.40, alpha: 1))
+    polygon([.init(x: 774, y: 465), .init(x: 714, y: 570), .init(x: 654, y: 570), .init(x: 686, y: 420)])
+        .fill(with: NSColor(red: 0.08, green: 0.12, blue: 0.21, alpha: 1))
 
-    let leftFace = NSBezierPath()
-    leftFace.move(to: NSPoint(x: 298, y: 516))
-    leftFace.line(to: NSPoint(x: 512, y: 392))
-    leftFace.line(to: NSPoint(x: 512, y: 238))
-    leftFace.line(to: NSPoint(x: 334, y: 324))
-    leftFace.close()
-    NSColor(red: 0.78, green: 0.91, blue: 1.0, alpha: 1).setFill()
-    leftFace.fill()
+    let front = NSBezierPath()
+    front.move(to: NSPoint(x: 250, y: 465))
+    front.line(to: NSPoint(x: 370, y: 405))
+    front.line(to: NSPoint(x: 452, y: 405))
+    front.curve(to: NSPoint(x: 512, y: 350), controlPoint1: NSPoint(x: 458, y: 405), controlPoint2: NSPoint(x: 458, y: 350))
+    front.curve(to: NSPoint(x: 572, y: 405), controlPoint1: NSPoint(x: 566, y: 350), controlPoint2: NSPoint(x: 566, y: 405))
+    front.line(to: NSPoint(x: 654, y: 405))
+    front.line(to: NSPoint(x: 774, y: 465))
+    front.line(to: NSPoint(x: 774, y: 280))
+    front.curve(to: NSPoint(x: 698, y: 204), controlPoint1: NSPoint(x: 774, y: 236), controlPoint2: NSPoint(x: 740, y: 204))
+    front.line(to: NSPoint(x: 326, y: 204))
+    front.curve(to: NSPoint(x: 250, y: 280), controlPoint1: NSPoint(x: 284, y: 204), controlPoint2: NSPoint(x: 250, y: 236))
+    front.close()
+    front.fill(with: NSColor(red: 0.12, green: 0.18, blue: 0.30, alpha: 1))
+    fillRoundedRect(NSRect(x: 455, y: 262, width: 114, height: 22), radius: 11, color: NSColor(red: 0.20, green: 0.95, blue: 0.92, alpha: 1))
 
-    let rightFace = NSBezierPath()
-    rightFace.move(to: NSPoint(x: 726, y: 516))
-    rightFace.line(to: NSPoint(x: 512, y: 392))
-    rightFace.line(to: NSPoint(x: 512, y: 238))
-    rightFace.line(to: NSPoint(x: 690, y: 324))
-    rightFace.close()
-    NSColor(red: 0.92, green: 0.98, blue: 1.0, alpha: 1).setFill()
-    rightFace.fill()
+}
 
-    let inside = NSBezierPath()
-    inside.move(to: NSPoint(x: 298, y: 516))
-    inside.line(to: NSPoint(x: 512, y: 634))
-    inside.line(to: NSPoint(x: 726, y: 516))
-    inside.line(to: NSPoint(x: 512, y: 392))
-    inside.close()
-    NSColor(red: 0.17, green: 0.48, blue: 0.96, alpha: 1).setFill()
-    inside.fill()
+func fillRoundedRect(_ rect: NSRect, radius: CGFloat, color: NSColor) {
+    color.setFill()
+    NSBezierPath(roundedRect: rect, xRadius: radius, yRadius: radius).fill()
+}
 
-    NSGraphicsContext.restoreGraphicsState()
+func polygon(_ points: [NSPoint]) -> NSBezierPath {
+    let path = NSBezierPath()
+    guard let first = points.first else { return path }
+    path.move(to: first)
+    points.dropFirst().forEach(path.line(to:))
+    path.close()
+    return path
+}
 
-    NSColor.white.withAlphaComponent(0.85).setStroke()
-    let rim = NSBezierPath()
-    rim.lineWidth = 24
-    rim.lineCapStyle = .round
-    rim.lineJoinStyle = .round
-    rim.move(to: NSPoint(x: 304, y: 516))
-    rim.line(to: NSPoint(x: 512, y: 392))
-    rim.line(to: NSPoint(x: 720, y: 516))
-    rim.stroke()
-
+private extension NSBezierPath {
+    func fill(with color: NSColor) {
+        color.setFill()
+        fill()
+    }
 }
 
 enum IconError: Error {
