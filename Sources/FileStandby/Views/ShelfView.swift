@@ -78,13 +78,13 @@ struct ShelfView: View {
                         RoundedRectangle(cornerRadius: 9, style: .continuous)
                             .fill(
                                 LinearGradient(
-                                    colors: [Color.accentColor, Color.accentColor.opacity(0.68)],
+                                    colors: [Color(red: 0.08, green: 0.12, blue: 0.21), Color(red: 0.16, green: 0.23, blue: 0.37)],
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing
                                 )
                             )
 
-                        TransferBoxMark(size: 18)
+                        TransferBoxMark(size: 25)
                     }
                     .frame(width: 32, height: 32)
 

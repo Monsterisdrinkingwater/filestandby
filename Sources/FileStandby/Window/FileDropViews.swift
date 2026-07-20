@@ -224,14 +224,14 @@ final class EdgeDropView: NSView {
         background.setFill()
         path.fill()
 
-        let markSize = min(bounds.width, bounds.height) * 0.56
+        let markSize = min(bounds.width, bounds.height) * 0.72
         let markRect = NSRect(
             x: bounds.midX - markSize / 2,
             y: bounds.midY - markSize / 2,
             width: markSize,
             height: markSize
         )
-        TransferBoxMarkImage.draw(in: markRect)
+        TransferBoxMarkImage.draw(in: markRect, style: .outline)
     }
 
     private func finishTargeting() {

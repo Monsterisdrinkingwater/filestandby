@@ -1,19 +1,25 @@
 import AppKit
 import SwiftUI
 
-/// The shared visual mark: a dark standby tray holding layered files.
+enum TransferBoxMarkStyle {
+    case color
+    case outline
+}
+
+/// Shared brand artwork. The color version mirrors the layered reference logo;
+/// the outline version stays legible in the menu bar and edge receiver.
 enum TransferBoxMarkImage {
-    static func image(size: CGFloat) -> NSImage {
-        let scale: CGFloat = 3
+    static func image(size: CGFloat, style: TransferBoxMarkStyle) -> NSImage {
+        let scale: CGFloat = 4
         let image = NSImage(size: NSSize(width: size * scale, height: size * scale))
         image.lockFocus()
-        draw(in: NSRect(origin: .zero, size: image.size))
+        draw(in: NSRect(origin: .zero, size: image.size), style: style)
         image.unlockFocus()
         image.size = NSSize(width: size, height: size)
         return image
     }
 
-    static func draw(in rect: NSRect) {
+    static func draw(in rect: NSRect, style: TransferBoxMarkStyle) {
         guard rect.width > 0, rect.height > 0,
               let context = NSGraphicsContext.current?.cgContext
         else { return }
@@ -21,59 +27,130 @@ enum TransferBoxMarkImage {
         context.saveGState()
         context.translateBy(x: rect.minX, y: rect.minY)
         context.scaleBy(x: rect.width / 100, y: rect.height / 100)
-        // Use a top-left origin so the same mark has the same orientation in
-        // SwiftUI images and the AppKit edge receiver.
         context.translateBy(x: 0, y: 100)
         context.scaleBy(x: 1, y: -1)
         defer { context.restoreGState() }
 
-        // The layered documents from the supplied logo reference.
-        roundedRect(x: 33, y: 9, width: 34, height: 45, radius: 8)
-            .fill(with: NSColor(red: 0.67, green: 0.42, blue: 0.93, alpha: 1))
-        roundedRect(x: 27, y: 18, width: 46, height: 46, radius: 8)
-            .fill(with: NSColor(red: 1.0, green: 0.78, blue: 0.30, alpha: 1))
-        roundedRect(x: 21, y: 27, width: 58, height: 48, radius: 9)
-            .fill(with: NSColor(red: 0.20, green: 0.82, blue: 0.75, alpha: 1))
-        roundedRect(x: 28, y: 37, width: 44, height: 40, radius: 9)
-            .fill(with: .white)
-
-        roundedRect(x: 36, y: 48, width: 28, height: 4, radius: 2)
-            .fill(with: NSColor(red: 0.76, green: 0.80, blue: 0.88, alpha: 1))
-        roundedRect(x: 36, y: 57, width: 21, height: 4, radius: 2)
-            .fill(with: NSColor(red: 0.80, green: 0.84, blue: 0.91, alpha: 1))
-
-        // Rear walls give the tray depth before its notched front wall covers
-        // the lower portion of the files.
-        path([
-            .init(x: 10, y: 47), .init(x: 18, y: 30), .init(x: 82, y: 30),
-            .init(x: 90, y: 47), .init(x: 90, y: 78), .init(x: 78, y: 91),
-            .init(x: 22, y: 91), .init(x: 10, y: 78)
-        ]).fill(with: NSColor(red: 0.10, green: 0.15, blue: 0.25, alpha: 1))
-
-        let trayFront = NSBezierPath()
-        trayFront.move(to: NSPoint(x: 10, y: 49))
-        trayFront.line(to: NSPoint(x: 29, y: 61))
-        trayFront.line(to: NSPoint(x: 39, y: 61))
-        trayFront.curve(to: NSPoint(x: 50, y: 70), controlPoint1: NSPoint(x: 40, y: 61), controlPoint2: NSPoint(x: 40, y: 70))
-        trayFront.curve(to: NSPoint(x: 61, y: 61), controlPoint1: NSPoint(x: 60, y: 70), controlPoint2: NSPoint(x: 60, y: 61))
-        trayFront.line(to: NSPoint(x: 71, y: 61))
-        trayFront.line(to: NSPoint(x: 90, y: 49))
-        trayFront.line(to: NSPoint(x: 90, y: 78))
-        trayFront.curve(to: NSPoint(x: 77, y: 91), controlPoint1: NSPoint(x: 90, y: 85), controlPoint2: NSPoint(x: 84, y: 91))
-        trayFront.line(to: NSPoint(x: 23, y: 91))
-        trayFront.curve(to: NSPoint(x: 10, y: 78), controlPoint1: NSPoint(x: 16, y: 91), controlPoint2: NSPoint(x: 10, y: 85))
-        trayFront.close()
-        trayFront.fill(with: NSColor(red: 0.13, green: 0.19, blue: 0.31, alpha: 1))
-
-        roundedRect(x: 42, y: 82, width: 16, height: 4, radius: 2)
-            .fill(with: NSColor(red: 0.20, green: 0.95, blue: 0.92, alpha: 1))
+        switch style {
+        case .color:
+            drawColorMark()
+        case .outline:
+            drawOutlineMark()
+        }
     }
 
-    private static func path(_ points: [NSPoint]) -> NSBezierPath {
+    private static func drawColorMark() {
+        // Dark interior cavity, visible around the layered documents.
+        roundedRect(x: 14, y: 29, width: 72, height: 55, radius: 14)
+            .fill(with: NSColor(red: 0.045, green: 0.075, blue: 0.13, alpha: 1))
+
+        roundedRect(x: 36, y: 5, width: 28, height: 48, radius: 7)
+            .fill(with: NSColor(red: 0.69, green: 0.43, blue: 0.93, alpha: 1))
+        roundedRect(x: 30, y: 14, width: 40, height: 48, radius: 8)
+            .fill(with: NSColor(red: 1.0, green: 0.79, blue: 0.32, alpha: 1))
+        roundedRect(x: 24, y: 23, width: 52, height: 49, radius: 9)
+            .fill(with: NSColor(red: 0.22, green: 0.82, blue: 0.75, alpha: 1))
+        roundedRect(x: 31, y: 34, width: 38, height: 42, radius: 9)
+            .fill(with: NSColor(red: 0.98, green: 0.99, blue: 1.0, alpha: 1))
+
+        roundedRect(x: 38, y: 45, width: 24, height: 3.5, radius: 1.75)
+            .fill(with: NSColor(red: 0.76, green: 0.80, blue: 0.88, alpha: 1))
+        roundedRect(x: 38, y: 53, width: 19, height: 3.5, radius: 1.75)
+            .fill(with: NSColor(red: 0.81, green: 0.84, blue: 0.91, alpha: 1))
+
+        // Raised side rails hold the documents inside the tray.
+        sideRail(left: true).fill(with: NSColor(red: 0.23, green: 0.31, blue: 0.47, alpha: 1))
+        sideRail(left: false).fill(with: NSColor(red: 0.10, green: 0.15, blue: 0.25, alpha: 1))
+
+        let front = trayFrontPath()
+        front.fill(with: NSColor(red: 0.15, green: 0.21, blue: 0.34, alpha: 1))
+
+        // A subtle upper rim makes the notch read as part of the tray.
+        let rim = trayRimPath()
+        rim.lineWidth = 3
+        rim.lineCapStyle = .round
+        rim.lineJoinStyle = .round
+        NSColor(red: 0.30, green: 0.38, blue: 0.54, alpha: 1).setStroke()
+        rim.stroke()
+
+        roundedRect(x: 42, y: 85, width: 16, height: 3.5, radius: 1.75)
+            .fill(with: NSColor(red: 0.23, green: 0.94, blue: 0.90, alpha: 1))
+    }
+
+    private static func drawOutlineMark() {
+        let stroke = NSColor.white
+
+        for (x, y, width) in [(34.0, 8.0, 32.0), (28.0, 17.0, 44.0), (22.0, 26.0, 56.0)] {
+            let card = NSBezierPath()
+            card.move(to: NSPoint(x: x, y: 51))
+            card.line(to: NSPoint(x: x, y: y + 8))
+            card.curve(to: NSPoint(x: x + 8, y: y), controlPoint1: NSPoint(x: x, y: y + 3.5), controlPoint2: NSPoint(x: x + 3.5, y: y))
+            card.line(to: NSPoint(x: x + width - 8, y: y))
+            card.curve(to: NSPoint(x: x + width, y: y + 8), controlPoint1: NSPoint(x: x + width - 3.5, y: y), controlPoint2: NSPoint(x: x + width, y: y + 3.5))
+            card.line(to: NSPoint(x: x + width, y: 51))
+            card.lineWidth = 5
+            card.lineCapStyle = .round
+            card.lineJoinStyle = .round
+            stroke.setStroke()
+            card.stroke()
+        }
+
+        let tray = NSBezierPath()
+        tray.move(to: NSPoint(x: 13, y: 48))
+        tray.line(to: NSPoint(x: 24, y: 87))
+        tray.curve(to: NSPoint(x: 31, y: 93), controlPoint1: NSPoint(x: 25, y: 91), controlPoint2: NSPoint(x: 28, y: 93))
+        tray.line(to: NSPoint(x: 69, y: 93))
+        tray.curve(to: NSPoint(x: 76, y: 87), controlPoint1: NSPoint(x: 72, y: 93), controlPoint2: NSPoint(x: 75, y: 91))
+        tray.line(to: NSPoint(x: 87, y: 48))
+        tray.line(to: NSPoint(x: 66, y: 48))
+        tray.line(to: NSPoint(x: 61, y: 62))
+        tray.line(to: NSPoint(x: 39, y: 62))
+        tray.line(to: NSPoint(x: 34, y: 48))
+        tray.close()
+        tray.lineWidth = 5
+        tray.lineJoinStyle = .round
+        stroke.setStroke()
+        tray.stroke()
+    }
+
+    private static func trayFrontPath() -> NSBezierPath {
+        let path = trayRimPath()
+        path.line(to: NSPoint(x: 89, y: 78))
+        path.curve(to: NSPoint(x: 77, y: 92), controlPoint1: NSPoint(x: 89, y: 86), controlPoint2: NSPoint(x: 84, y: 92))
+        path.line(to: NSPoint(x: 23, y: 92))
+        path.curve(to: NSPoint(x: 11, y: 78), controlPoint1: NSPoint(x: 16, y: 92), controlPoint2: NSPoint(x: 11, y: 86))
+        path.close()
+        return path
+    }
+
+    private static func trayRimPath() -> NSBezierPath {
         let path = NSBezierPath()
-        guard let first = points.first else { return path }
-        path.move(to: first)
-        points.dropFirst().forEach(path.line(to:))
+        path.move(to: NSPoint(x: 11, y: 52))
+        path.curve(to: NSPoint(x: 31, y: 49), controlPoint1: NSPoint(x: 18, y: 50), controlPoint2: NSPoint(x: 24, y: 49))
+        path.line(to: NSPoint(x: 39, y: 49))
+        path.curve(to: NSPoint(x: 46, y: 62), controlPoint1: NSPoint(x: 41, y: 49), controlPoint2: NSPoint(x: 41, y: 62))
+        path.line(to: NSPoint(x: 54, y: 62))
+        path.curve(to: NSPoint(x: 61, y: 49), controlPoint1: NSPoint(x: 59, y: 62), controlPoint2: NSPoint(x: 59, y: 49))
+        path.line(to: NSPoint(x: 69, y: 49))
+        path.curve(to: NSPoint(x: 89, y: 52), controlPoint1: NSPoint(x: 76, y: 49), controlPoint2: NSPoint(x: 82, y: 50))
+        return path
+    }
+
+    private static func sideRail(left: Bool) -> NSBezierPath {
+        let path = NSBezierPath()
+        if left {
+            path.move(to: NSPoint(x: 11, y: 52))
+            path.line(to: NSPoint(x: 19, y: 31))
+            path.curve(to: NSPoint(x: 25, y: 27), controlPoint1: NSPoint(x: 20, y: 28), controlPoint2: NSPoint(x: 22, y: 27))
+            path.line(to: NSPoint(x: 30, y: 27))
+            path.line(to: NSPoint(x: 31, y: 49))
+        } else {
+            path.move(to: NSPoint(x: 89, y: 52))
+            path.line(to: NSPoint(x: 81, y: 31))
+            path.curve(to: NSPoint(x: 75, y: 27), controlPoint1: NSPoint(x: 80, y: 28), controlPoint2: NSPoint(x: 78, y: 27))
+            path.line(to: NSPoint(x: 70, y: 27))
+            path.line(to: NSPoint(x: 69, y: 49))
+        }
         path.close()
         return path
     }
@@ -92,13 +169,15 @@ private extension NSBezierPath {
 
 struct TransferBoxMark: View {
     let size: CGFloat
+    let style: TransferBoxMarkStyle
 
-    init(size: CGFloat) {
+    init(size: CGFloat, style: TransferBoxMarkStyle = .color) {
         self.size = size
+        self.style = style
     }
 
     var body: some View {
-        Image(nsImage: TransferBoxMarkImage.image(size: size))
+        Image(nsImage: TransferBoxMarkImage.image(size: size, style: style))
             .resizable()
             .interpolation(.high)
             .frame(width: size, height: size)
