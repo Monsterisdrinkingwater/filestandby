@@ -4,6 +4,7 @@ import SwiftUI
 enum TransferBoxMarkStyle {
     case color
     case outline
+    case receiver
 }
 
 /// Shared brand artwork. The color version mirrors the layered reference logo;
@@ -43,6 +44,8 @@ enum TransferBoxMarkImage {
             drawColorMark()
         case .outline:
             drawOutlineMark()
+        case .receiver:
+            drawReceiverMark()
         }
     }
 
@@ -118,6 +121,36 @@ enum TransferBoxMarkImage {
         tray.lineJoinStyle = .round
         stroke.setStroke()
         tray.stroke()
+    }
+
+    /// A transparent blue-and-white variant sized for the edge receiver.
+    private static func drawReceiverMark() {
+        let blue = NSColor(red: 0.38, green: 0.76, blue: 1.0, alpha: 0.72)
+        let white = NSColor.white.withAlphaComponent(0.94)
+
+        roundedRect(x: 34, y: 13, width: 32, height: 41, radius: 7)
+            .fill(with: blue)
+        roundedRect(x: 29, y: 23, width: 40, height: 43, radius: 8)
+            .fill(with: NSColor.white.withAlphaComponent(0.42))
+        roundedRect(x: 35, y: 34, width: 30, height: 36, radius: 8)
+            .fill(with: NSColor.white.withAlphaComponent(0.86))
+
+        let front = trayFrontPath()
+        front.fill(with: NSColor(red: 0.42, green: 0.80, blue: 1.0, alpha: 0.30))
+        front.lineWidth = 4.5
+        front.lineJoinStyle = .round
+        white.setStroke()
+        front.stroke()
+
+        let rim = trayRimPath()
+        rim.lineWidth = 5
+        rim.lineCapStyle = .round
+        rim.lineJoinStyle = .round
+        white.setStroke()
+        rim.stroke()
+
+        roundedRect(x: 42, y: 84, width: 16, height: 3, radius: 1.5)
+            .fill(with: NSColor.white.withAlphaComponent(0.92))
     }
 
     private static func trayFrontPath() -> NSBezierPath {

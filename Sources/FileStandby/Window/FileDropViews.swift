@@ -231,8 +231,7 @@ final class EdgeDropView: NSView {
             width: markSize,
             height: markSize
         )
-        let image = TransferBoxMarkImage.image(size: markSize, style: .color)
-        image.draw(in: markRect)
+        TransferBoxMarkImage.draw(in: markRect, style: .receiver)
     }
 
     private func finishTargeting() {
