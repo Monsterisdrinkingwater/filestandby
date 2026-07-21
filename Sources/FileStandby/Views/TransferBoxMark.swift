@@ -10,6 +10,13 @@ enum TransferBoxMarkStyle {
 /// the outline version stays legible in the menu bar and edge receiver.
 enum TransferBoxMarkImage {
     static func image(size: CGFloat, style: TransferBoxMarkStyle) -> NSImage {
+        if case .color = style,
+           let iconURL = Bundle.main.url(forResource: "FileStandby", withExtension: "icns"),
+           let icon = NSImage(contentsOf: iconURL) {
+            icon.size = NSSize(width: size, height: size)
+            return icon
+        }
+
         let scale: CGFloat = 4
         let image = NSImage(size: NSSize(width: size * scale, height: size * scale))
         image.lockFocus()
