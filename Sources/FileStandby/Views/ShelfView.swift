@@ -9,6 +9,7 @@ struct ShelfView: View {
     let onQuit: () -> Void
 
     @State private var isConfirmingClear = false
+    @State private var selection = ShelfSelection()
 
     var body: some View {
         VStack(spacing: 0) {
@@ -40,6 +41,9 @@ struct ShelfView: View {
             }
         }
         .animation(.snappy(duration: 0.22), value: store.isDropTargeted)
+        .onChange(of: store.items.map(\.id)) { _, currentIDs in
+            selection.retainOnly(Set(currentIDs))
+        }
         .alert(
             "File Standby",
             isPresented: Binding(
@@ -59,6 +63,7 @@ struct ShelfView: View {
         ) {
             Button("清空", role: .destructive) {
                 store.clear()
+                selection.clear()
             }
             Button("取消", role: .cancel) {}
         } message: {
@@ -142,7 +147,20 @@ struct ShelfView: View {
                     ShelfItemRow(
                         item: item,
                         resolvedURL: store.resolvedURL(for: item),
-                        onRemove: { store.remove(item) }
+                        isSelected: selection.ids.contains(item.id),
+                        onSelect: { modifiers in
+                            selection.select(
+                                item.id,
+                                in: store.items.map(\.id),
+                                command: modifiers.contains(.command),
+                                shift: modifiers.contains(.shift)
+                            )
+                        },
+                        onDragURLs: { urlsToDrag(startingAt: item) },
+                        onRemove: {
+                            store.remove(item)
+                            selection.retainOnly(Set(store.items.map(\.id)))
+                        }
                     )
                     .transition(.opacity.combined(with: .move(edge: .trailing)))
                 }
@@ -189,7 +207,35 @@ struct ShelfView: View {
             .buttonStyle(.plain)
             .font(.system(size: 11, weight: .semibold))
 
+            if store.items.count > 1 {
+                if selection.ids.count == store.items.count {
+                    Button("取消选择") { selection.clear() }
+                        .buttonStyle(.plain)
+                        .font(.system(size: 11, weight: .medium))
+                } else {
+                    Button("全选") { selection.selectAll(store.items.map(\.id)) }
+                        .buttonStyle(.plain)
+                        .font(.system(size: 11, weight: .medium))
+                        .keyboardShortcut("a", modifiers: .command)
+                }
+            }
+
             Spacer()
+
+            if !selection.ids.isEmpty {
+                Text("已选 \(selection.ids.count)")
+                    .font(.system(size: 10, weight: .medium))
+                    .foregroundStyle(.secondary)
+
+                Button {
+                    store.remove(ids: selection.ids)
+                    selection.clear()
+                } label: {
+                    Image(systemName: "minus.circle")
+                }
+                .buttonStyle(.plain)
+                .help("从文件架移除所选项目")
+            }
 
             if !store.items.isEmpty {
                 Button {
@@ -253,6 +299,17 @@ struct ShelfView: View {
         panel.begin { response in
             guard response == .OK else { return }
             store.add(urls: panel.urls)
+        }
+    }
+
+    private func urlsToDrag(startingAt item: ShelfItem) -> [URL] {
+        let ids = Set(selection.itemsToDrag(
+            startingAt: item.id,
+            in: store.items.map(\.id)
+        ))
+        return store.items.compactMap { candidate in
+            guard ids.contains(candidate.id) else { return nil }
+            return store.resolvedURL(for: candidate)
         }
     }
 }

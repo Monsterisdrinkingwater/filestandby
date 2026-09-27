@@ -4,42 +4,50 @@ import SwiftUI
 struct ShelfItemRow: View {
     let item: ShelfItem
     let resolvedURL: URL?
+    let isSelected: Bool
+    let onSelect: (NSEvent.ModifierFlags) -> Void
+    let onDragURLs: () -> [URL]
     let onRemove: () -> Void
 
     @State private var isHovering = false
 
-    @ViewBuilder
     var body: some View {
-        if let resolvedURL {
-            rowContent
-                .onDrag {
-                    NSItemProvider(object: resolvedURL as NSURL)
-                } preview: {
-                    dragPreview(for: resolvedURL)
-                }
-                .accessibilityHint("拖动整张卡片到 Finder 或其他应用")
-        } else {
-            rowContent
-        }
+        rowContent
+            .accessibilityHint("Command 点击多选，Shift 点击连续选择；拖动选中文件到 Finder 或其他应用")
     }
 
     private var rowContent: some View {
         HStack(spacing: 12) {
-            icon
+            HStack(spacing: 12) {
+                icon
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text(item.displayName)
-                    .font(.system(size: 13, weight: .semibold))
-                    .lineLimit(2)
-                    .foregroundStyle(resolvedURL == nil ? .secondary : .primary)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(item.displayName)
+                        .font(.system(size: 13, weight: .semibold))
+                        .lineLimit(2)
+                        .foregroundStyle(resolvedURL == nil ? .secondary : .primary)
 
-                Label(metadataText, systemImage: resolvedURL == nil ? "exclamationmark.triangle.fill" : metadataIcon)
-                    .font(.system(size: 10, weight: .medium))
-                    .foregroundStyle(resolvedURL == nil ? Color.orange : Color.secondary)
-                    .lineLimit(1)
+                    Label(metadataText, systemImage: resolvedURL == nil ? "exclamationmark.triangle.fill" : metadataIcon)
+                        .font(.system(size: 10, weight: .medium))
+                        .foregroundStyle(resolvedURL == nil ? Color.orange : Color.secondary)
+                        .lineLimit(1)
+                }
+
+                Spacer(minLength: 4)
             }
-
-            Spacer(minLength: 4)
+            .overlay {
+                ShelfItemInteractionView(
+                    title: item.displayName,
+                    isSelected: isSelected,
+                    isAvailable: resolvedURL != nil,
+                    onClick: onSelect,
+                    onPreview: preview,
+                    onDragURLs: onDragURLs,
+                    onShowInFinder: showInFinder,
+                    onCopyPath: copyPath,
+                    onRemove: onRemove
+                )
+            }
 
             if isHovering {
                 HStack(spacing: 2) {
@@ -47,10 +55,7 @@ struct ShelfItemRow: View {
                         title: "快速预览",
                         systemImage: "eye",
                         disabled: resolvedURL == nil
-                    ) {
-                        guard let resolvedURL else { return }
-                        QuickLookController.shared.preview(resolvedURL)
-                    }
+                    ) { preview() }
 
                     actionButton(title: "移除", systemImage: "xmark") {
                         onRemove()
@@ -63,46 +68,16 @@ struct ShelfItemRow: View {
         .padding(.vertical, 10)
         .background {
             RoundedRectangle(cornerRadius: 13, style: .continuous)
-                .fill(isHovering ? Color.primary.opacity(0.075) : Color.primary.opacity(0.045))
+                .fill(isSelected ? Color.accentColor.opacity(0.18) : Color.primary.opacity(isHovering ? 0.075 : 0.045))
         }
         .overlay {
             RoundedRectangle(cornerRadius: 13, style: .continuous)
-                .stroke(Color.primary.opacity(isHovering ? 0.12 : 0.07), lineWidth: 1)
+                .stroke(isSelected ? Color.accentColor.opacity(0.65) : Color.primary.opacity(isHovering ? 0.12 : 0.07), lineWidth: 1)
         }
         .contentShape(RoundedRectangle(cornerRadius: 13, style: .continuous))
         .onHover { hovering in
             withAnimation(.easeOut(duration: 0.14)) {
                 isHovering = hovering
-            }
-        }
-        .onTapGesture(count: 2) {
-            guard let resolvedURL else { return }
-            QuickLookController.shared.preview(resolvedURL)
-        }
-        .contextMenu {
-            Button("快速预览") {
-                guard let resolvedURL else { return }
-                QuickLookController.shared.preview(resolvedURL)
-            }
-            .disabled(resolvedURL == nil)
-
-            Button("在 Finder 中显示") {
-                guard let resolvedURL else { return }
-                NSWorkspace.shared.activateFileViewerSelecting([resolvedURL])
-            }
-            .disabled(resolvedURL == nil)
-
-            Button("复制路径") {
-                guard let resolvedURL else { return }
-                NSPasteboard.general.clearContents()
-                NSPasteboard.general.setString(resolvedURL.path, forType: .string)
-            }
-            .disabled(resolvedURL == nil)
-
-            Divider()
-
-            Button("从文件架移除", role: .destructive) {
-                onRemove()
             }
         }
     }
@@ -125,21 +100,20 @@ struct ShelfItemRow: View {
         }
     }
 
-    private func dragPreview(for url: URL) -> some View {
-        HStack(spacing: 10) {
-            Image(nsImage: NSWorkspace.shared.icon(forFile: url.path))
-                .resizable()
-                .scaledToFit()
-                .frame(width: 32, height: 32)
+    private func preview() {
+        guard let resolvedURL else { return }
+        QuickLookController.shared.preview(resolvedURL)
+    }
 
-            Text(item.displayName)
-                .font(.system(size: 12, weight: .semibold))
-                .lineLimit(1)
-        }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 9)
-        .frame(maxWidth: 240, alignment: .leading)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+    private func showInFinder() {
+        guard let resolvedURL else { return }
+        NSWorkspace.shared.activateFileViewerSelecting([resolvedURL])
+    }
+
+    private func copyPath() {
+        guard let resolvedURL else { return }
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(resolvedURL.path, forType: .string)
     }
 
     private var metadataText: String {

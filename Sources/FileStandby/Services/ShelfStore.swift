@@ -62,6 +62,12 @@ final class ShelfStore {
         persist()
     }
 
+    func remove(ids: Set<UUID>) {
+        guard !ids.isEmpty else { return }
+        items.removeAll { ids.contains($0.id) }
+        persist()
+    }
+
     func clear() {
         guard !items.isEmpty else { return }
         items.removeAll()

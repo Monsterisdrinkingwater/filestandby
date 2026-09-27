@@ -46,6 +46,25 @@ struct ShelfStoreTests {
         #expect(FileManager.default.fileExists(atPath: secondFile.path))
     }
 
+    @Test("removing multiple selected items preserves their original files")
+    func removeMultiple() throws {
+        let fixture = try Fixture()
+        defer { fixture.cleanUp() }
+
+        let first = try fixture.makeFile(named: "first.txt", contents: "1")
+        let second = try fixture.makeFile(named: "second.txt", contents: "2")
+        let third = try fixture.makeFile(named: "third.txt", contents: "3")
+        let store = ShelfStore(persistence: fixture.persistence)
+        store.add(urls: [first, second, third])
+
+        let ids = Set(store.items.filter { $0.originalPath != second.path }.map(\.id))
+        store.remove(ids: ids)
+
+        #expect(store.items.map(\.originalPath) == [second.path])
+        #expect([first, second, third].allSatisfy { FileManager.default.fileExists(atPath: $0.path) })
+        #expect(ShelfStore(persistence: fixture.persistence).items.map(\.originalPath) == [second.path])
+    }
+
     @Test("missing source files stay on the shelf as unavailable items")
     func missingFilesRemainVisible() throws {
         let fixture = try Fixture()

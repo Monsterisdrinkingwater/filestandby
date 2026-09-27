@@ -10,7 +10,7 @@
 - 自定义 macOS 应用图标，主界面和菜单栏视觉一致
 - 主屏幕右侧常驻投放拉手，点击或拖入文件时展开
 - 支持从 Finder 拖入多个文件和文件夹
-- 拖动整张文件卡片到 Finder 或其他支持文件 URL 的应用
+- 文件架内支持 Command 点击多选、Shift 点击连续选择或点击“全选”，并一起拖到 Finder 或其他支持文件 URL 的应用
 - 拖动顶部标题区域可自由调整文件架位置
 - 蓝色文件接收器只能沿屏幕四周移动，不能停在屏幕中间；顶部/底部为横向，左侧/右侧为竖向
 - 接收器始终保持 112 × 26 的统一长短边规格，只随所在边缘旋转方向
@@ -39,13 +39,28 @@ swift run FileStandby
 open .build/FileStandby.app
 ```
 
-脚本会生成临时 ad-hoc 签名的 `.build/FileStandby.app`。正式分发时应改用 Apple Developer 证书完成签名、公证，并根据发布渠道启用 App Sandbox。
+生成可发布到 GitHub Release 的 DMG 安装包：
+
+```bash
+./scripts/build-dmg.sh
+open .build/FileStandby-0.1.1.dmg
+```
+
+该脚本会同时构建 Apple Silicon（arm64）和 Intel（x86_64），生成一个通用 DMG。
+打开 DMG 后，把 `FileStandby.app` 拖到 `Applications` 即可安装。也可以使用
+`make dmg` 执行同样的打包流程。生成的 DMG 文件名会根据
+`Resources/Info.plist` 中的版本号自动变化。
+
+脚本会生成临时 ad-hoc 签名的 `.build/FileStandby.app`。发布到 GitHub Release
+前，建议使用 Apple Developer 的 Developer ID Application 证书签名并完成公证，
+否则用户首次打开时可能看到 macOS 的开发者身份验证提示。正式分发时还应根据
+发布渠道启用 App Sandbox。
 
 ## 使用方式
 
 1. 从 Finder 把文件或文件夹拖到右侧拉手，或展开后的文件架。
 2. 在文件架里双击卡片进行 Quick Look；右键可在 Finder 中定位或复制路径。
-3. 拖动整张文件卡片到目标 Finder 窗口或其他应用。
+3. 点击选择卡片；按住 Command 可多选，按住 Shift 可连续选择，也可点击“全选”。拖动选中的卡片可将多个文件一起拖到目标 Finder 窗口或其他应用。
 4. 按住顶部标题区域拖动，可调整文件架在屏幕上的位置。
 5. 完成后手动移除卡片；移除卡片不会删除原文件。
 
